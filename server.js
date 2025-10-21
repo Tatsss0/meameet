@@ -57,18 +57,24 @@ app.get('/agora/token', (req, res) => {
     if (typeof accountParam === 'string' && accountParam.trim()) {
       uidType = 'account'
       uidUsed = String(accountParam)
-      token = RtcTokenBuilder.buildWithAccount(APP_ID, APP_CERT, channel, uidUsed, role, privilegeExpiredTs)
+      token = (RtcTokenBuilder.buildTokenWithAccount
+        ? RtcTokenBuilder.buildTokenWithAccount(APP_ID, APP_CERT, channel, uidUsed, role, privilegeExpiredTs)
+        : RtcTokenBuilder.buildWithAccount(APP_ID, APP_CERT, channel, uidUsed, role, privilegeExpiredTs))
     } else if (typeof uidParam !== 'undefined') {
       // if uid is present but not numeric, fall back to account token
       const n = parseInt(String(uidParam), 10)
       if (Number.isFinite(n)) {
         uidType = 'uid'
         uidUsed = n
-        token = RtcTokenBuilder.buildWithUid(APP_ID, APP_CERT, channel, n, role, privilegeExpiredTs)
+        token = (RtcTokenBuilder.buildTokenWithUid
+          ? RtcTokenBuilder.buildTokenWithUid(APP_ID, APP_CERT, channel, n, role, privilegeExpiredTs)
+          : RtcTokenBuilder.buildWithUid(APP_ID, APP_CERT, channel, n, role, privilegeExpiredTs))
       } else {
         uidType = 'account'
         uidUsed = String(uidParam)
-        token = RtcTokenBuilder.buildWithAccount(APP_ID, APP_CERT, channel, uidUsed, role, privilegeExpiredTs)
+        token = (RtcTokenBuilder.buildTokenWithAccount
+          ? RtcTokenBuilder.buildTokenWithAccount(APP_ID, APP_CERT, channel, uidUsed, role, privilegeExpiredTs)
+          : RtcTokenBuilder.buildWithAccount(APP_ID, APP_CERT, channel, uidUsed, role, privilegeExpiredTs))
       }
     } else {
       return res.status(400).json({ error: 'Missing uid/account', detail: 'Provide ?uid=<number> or ?account=<string>' })
